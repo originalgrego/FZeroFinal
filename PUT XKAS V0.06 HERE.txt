@@ -1,0 +1,9 @@
+You will need to obtain a copy of XKAS v0.06 and place it in the project directory.
+
+RHDN:
+
+https://www.romhacking.net/utilities/269/
+
+SMWCentral:
+
+https://www.smwcentral.net/?p=section&a=details&id=4615
