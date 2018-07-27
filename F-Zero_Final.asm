@@ -68,7 +68,7 @@ incsrc All_Practice.asm
 
 ;Set rom size to 2mb
 org $00FFD7
-	db $0B
+	DB $0B
 
 ; Hijack track variation loading so it may be disabled for custom/ace league
 org $009f9b
@@ -174,7 +174,7 @@ org $108000
 ; Make mute city iv use variation 3, gives it the dark horizon, messes up mini map loading ;(
 ; TODO: Make horizon table configurable.
 org $12e03b
-	;db $E7
+	;DB $E7
 	
 ;Dem hacks
 org $308000
@@ -654,7 +654,7 @@ BLANK_TRACK_NAME:
 ; League selction hijack tables
 ;=========================================================
 LEAGUE_SELECTION_JSR_TABLE:
-	dw KNIGHT_LEAGUE, QUEEN_LEAGUE, KING_LEAGUE, ACE_LEAGUE
+	DW KNIGHT_LEAGUE, QUEEN_LEAGUE, KING_LEAGUE, ACE_LEAGUE
 
 LEAGUE_SELECTION_FUNC_TABLE:
 	KNIGHT_LEAGUE:
@@ -675,19 +675,19 @@ LEAGUE_SELECTION_FUNC_TABLE:
 ; League selection tiles
 ;=========================================================
 SELECT_LEAGUE_SCREEN_KNIGHT_LEAGUE_TILES:
-	db $CC, $08, $CE, $08, $CA, $08, $C8, $08, $C9, $08, $D5, $08, $FF, $04, $CD, $08, $C6, $08, $AF, $08, $C8, $08, $D6, $08, $C6, $08
+	DB $CC, $08, $CE, $08, $CA, $08, $C8, $08, $C9, $08, $D5, $08, $FF, $04, $CD, $08, $C6, $08, $AF, $08, $C8, $08, $D6, $08, $C6, $08
 
 SELECT_LEAGUE_SCREEN_QUEEN_LEAGUE_TILES:
-	db $D2, $08, $D6, $08, $C6, $08, $C6, $08, $CE, $08, $FF, $08, $CD, $08, $C6, $08, $AF, $08, $C8, $08, $D6, $08, $C6, $08, $FF, $08
+	DB $D2, $08, $D6, $08, $C6, $08, $C6, $08, $CE, $08, $FF, $08, $CD, $08, $C6, $08, $AF, $08, $C8, $08, $D6, $08, $C6, $08, $FF, $08
 
 SELECT_LEAGUE_SCREEN_KING_LEAGUE_TILES:
-	db $CC, $08, $CA, $08, $CE, $08, $C8, $08, $FF, $08, $CD, $08, $C6, $08, $AF, $08, $C8, $08, $D6, $08, $C6, $08, $FF, $08, $FF, $08
+	DB $CC, $08, $CA, $08, $CE, $08, $C8, $08, $FF, $08, $CD, $08, $C6, $08, $AF, $08, $C8, $08, $D6, $08, $C6, $08, $FF, $08, $FF, $08
 
 SELECT_LEAGUE_SCREEN_ACE_LEAGUE_TILES:
-	db $AF, $08, $C4, $08, $C6, $08, $FF, $08, $CD, $08, $C6, $08, $AF, $08, $C8, $08, $D6, $08, $C6, $08, $FF, $08, $FF, $08, $FF, $08
+	DB $AF, $08, $C4, $08, $C6, $08, $FF, $08, $CD, $08, $C6, $08, $AF, $08, $C8, $08, $D6, $08, $C6, $08, $FF, $08, $FF, $08, $FF, $08
 
 SELECT_LEAGUE_CLEAR_TILES:
-	db $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08
+	DB $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08
 ;=========================================================
 
 ;=========================================================
@@ -695,7 +695,7 @@ SELECT_LEAGUE_CLEAR_TILES:
 ;=========================================================
 org $30ED00
 TRACK_MODIFICATIONS_ENABLED_TABLE:
-	dw #$0001, #$0001, #$0001, #$0000
+	DW #$0001, #$0001, #$0001, #$0000
 ;=========================================================
 
 ;=========================================================
@@ -715,7 +715,7 @@ endmacro
 
 org $30EE00
 LOAD_TRACK_GFX_JSR_TABLE:
-	dw FZ_TRACK_GFX, FZ_TRACK_GFX, FZ_TRACK_GFX, GP2_TRACK_GFX
+	DW FZ_TRACK_GFX, FZ_TRACK_GFX, FZ_TRACK_GFX, GP2_TRACK_GFX
 
 org $30EF00
 LOAD_TRACK_GFX_FUNC_TABLE:
@@ -744,7 +744,7 @@ endmacro
 
 org $30F000
 AI_CHECKPOINT_JSR_TABLE:
-	dw FZ_AI_CHECKPOINT, FZ_AI_CHECKPOINT, FZ_AI_CHECKPOINT, GP2_AI_CHECKPOINT
+	DW FZ_AI_CHECKPOINT, FZ_AI_CHECKPOINT, FZ_AI_CHECKPOINT, GP2_AI_CHECKPOINT
 
 org $30F100
 AI_CHECKPOINT_FUNC_TABLE:
@@ -768,7 +768,7 @@ endmacro
 ;Track mines hijack table
 org $30F400
 TRACK_MINES_JSR_TABLE:
-	dw FZ_TRACK_MINES, FZ_TRACK_MINES, FZ_TRACK_MINES, GP2_TRACK_MINES
+	DW FZ_TRACK_MINES, FZ_TRACK_MINES, FZ_TRACK_MINES, GP2_TRACK_MINES
 
 org $30F500
 TRACK_MINES_FUNC_TABLE:
@@ -789,7 +789,7 @@ endmacro
 
 org $30F600
 TILE_POOL_JSR_TABLE:
-	dw FZ_TILE_POOL, FZ_TILE_POOL, FZ_TILE_POOL, GP2_TILE_POOL
+	DW FZ_TILE_POOL, FZ_TILE_POOL, FZ_TILE_POOL, GP2_TILE_POOL
 
 org $30F700
 TILE_POOL_FUNC_TABLE:
@@ -810,7 +810,7 @@ endmacro
 
 org $30FA00
 TRACK_SETTINGS_JSR_TABLE:
-	dw FZ_TRACK_SETTINGS, FZ_TRACK_SETTINGS, FZ_TRACK_SETTINGS, GP2_TRACK_SETTINGS
+	DW FZ_TRACK_SETTINGS, FZ_TRACK_SETTINGS, FZ_TRACK_SETTINGS, GP2_TRACK_SETTINGS
 
 org $30FB00
 TRACK_SETTINGS_FUNC_TABLE:
@@ -836,7 +836,7 @@ endmacro
 
 org $30FC00
 READ_ORG_SIZE_JSR_TABLE:
-	dw FZ_READ_ORG, FZ_READ_ORG, FZ_READ_ORG, GP2_READ_ORG
+	DW FZ_READ_ORG, FZ_READ_ORG, FZ_READ_ORG, GP2_READ_ORG
 
 org $30FD00
 READ_ORG_FUNC_TABLE:
@@ -861,7 +861,7 @@ endmacro
 
 org $30F800
 SET_READ_BANK_JSR_TABLE:
-	dw FZ_SET_READ_BANK, FZ_SET_READ_BANK, FZ_SET_READ_BANK, GP2_SET_READ_BANK
+	DW FZ_SET_READ_BANK, FZ_SET_READ_BANK, FZ_SET_READ_BANK, GP2_SET_READ_BANK
 
 org $30F900
 SET_READ_BANK_FUNC_TABLE:
@@ -886,7 +886,7 @@ endmacro
 
 org $30FE00
 LOAD_PALETTE_JSR_TABLE:
-	dw LOAD_FZ_PALETTE, LOAD_FZ_PALETTE, LOAD_FZ_PALETTE, LOAD_GP2_PALETTE
+	DW LOAD_FZ_PALETTE, LOAD_FZ_PALETTE, LOAD_FZ_PALETTE, LOAD_GP2_PALETTE
 
 org $30FF00
 LOAD_PALETTE_FUNC_TABLE:
