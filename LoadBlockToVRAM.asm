@@ -1,4 +1,9 @@
 ;============================================================================
+; Author: bazz
+; Borrowed from: https://wiki.superfamicom.org/working-with-vram-initializing-tiles-and-tile-maps
+;============================================================================
+
+;============================================================================
 ; LoadBlockToVRAM -- Macro that simplifies calling LoadVRAM to copy data to VRAM
 ;----------------------------------------------------------------------------
 ; In: SRC_ADDR -- 24 bit address of source data

@@ -14,7 +14,7 @@ Please do not distribute this work without providing all source code and attribu
 
 Installation:
 
-To apply the patch please place your F-Zero USA and Grand Prix 2 roms (legally obtained ofcourse) into a folder named SNES_ROMS exactly one directory up from the F-Zero Final project folder.
+To apply the patch please place your F-Zero USA and Grand Prix 2 roms (legally obtained of course) into a folder named SNES_ROMS exactly one directory up from the F-Zero Final project folder.
 
 Your roms will need to be named F-Zero.sfc and F-Zero_Grand_Prix_2.sfc (or you will need to modify the projects batch files and source to handle your naming convention).
 
