@@ -1,7 +1,7 @@
 lorom
 
 ;=========================================================
-; F-Zero Final v0.1
+; F-Zero Final v0.2
 ; Authors: Gregory Lewandowski (Grego), Richard Bukor (CatadorDeLatas)
 ;
 ; A mod to bring all of the content from BS F-Zero Grand Prix 2 into the original F-Zero and
@@ -60,11 +60,24 @@ lorom
 
 !GP2_TRACK_SETTINGS_TABLE_ADDRESS equ $12e02c
 
+!DECOMP_TRACK_BG_TILEMAP equ $039806
+
+!FZ_BG1_TILEMAP_OFFSET equ $00B19D
+!FZ_BG2_TILEMAP_OFFSET equ $00B19D+2
+
+!GP2_BG1_TILEMAP_OFFSET equ $10AFAE
+!GP2_BG2_TILEMAP_OFFSET equ $10AFAE+2
+
 ; Increase the leagues!
 !MAX_LEAGUE equ $03
 
 incsrc Divide.asm
+
 incsrc All_Practice.asm
+
+incsrc SRAM_Fix.asm
+
+incsrc Master_Ending.asm
 
 ;Set rom size to 2mb
 org $00FFD7
@@ -159,10 +172,6 @@ org $02c305
 	NOP
 	NOP
 
-; Use new track_sram_ofs table
-org $02c612
-	JML Hijack_Get_Track_SRAM_Ofs
-
 ; Hijack track name handling
 org $00abd3
 	JML Hijack_Track_Names
@@ -171,15 +180,49 @@ org $00abd3
 org $108000
 	incbin ../SNES_ROMS/F-Zero_Grand_Prix_2.sfc
 
+; This must come after gp2 rom as it modifies it
+incsrc GP2_Hover_Cars.asm
+
 ; Make mute city iv use variation 3, gives it the dark horizon, messes up mini map loading ;(
 ; TODO: Make horizon table configurable.
 org $12e03b
 	;DB $E7
+
+; Load BG1 horizon for race
+org $00A4C9
+	PHX
+	JSL Hijack_Load_Track_BG1
+	BRA $01 ; NOP*3
+
+; Load BG2 horizon for race
+org $00A518
+	JSL Hijack_Load_Track_BG2
+	BRA $01 ; NOP*3
+
+; Load BG1 horizon for records
+org $038D38
+	JSL Hijack_Load_Track_BG1
+	BRA $01 ; NOP*3
+
+; Load BG2 horizon for records
+org $038D4A
+	JSL Hijack_Load_Track_BG2
+	BRA $01 ; NOP*3
+	
+org $00a11d
+	JML Hijack_Horizon_Gradient
 	
 ;Dem hacks
 org $308000
 	incsrc LoadBlockToVRAM.asm
+	
+	incsrc GP2_Hover_Cars_Hijacks.asm
+	
+	incsrc Master_Ending_Hijacks.asm
 
+Top_Down_GP2_Cars_GFX:
+	incbin GP2_Top_Down_Cars.bin
+	
 ;=========================================================
 ; Hijack the NMI handler to draw our custom league menu
 ;=========================================================
@@ -195,10 +238,17 @@ Hijack_NMI:
 
 	LDA !GAME_STATE
 	CMP #$0501 ; Game state equal to #$01 (menu) and game state + 1 equal to #$05 (league selection)?
-	BNE .exit
+	BNE .continue
 
 	JSR Draw_Custom_League_Menu
 
+.continue 
+
+	CMP #$0101
+	BNE .exit
+	
+	;JSR Draw_Custom_Car_Selection_Screen
+	
 .exit
 	JML $0080e0
 ;=========================================================
@@ -573,22 +623,45 @@ Hijack_Track_Names:
 ;=========================================================
 
 ;=========================================================
-; Hijack the loading of track SRAM offsets.  The original table only contained enough
-; entries for the 15 maps in F-Zero, this allows us to expand the table to handle more than 15 maps.
-;
-; TODO: Expand SRAM and fix handling of SRAM records
+; Hijack the loading of the track BG1 horizon to use the correct table for GP2 if necessary
 ;=========================================================
-Hijack_Get_Track_SRAM_Ofs:
+Hijack_Load_Track_BG1:
+	PHP
+	
+	JSR Get_League_Table_Offset
+
+	TXY
 	TAX
 
 	REP #$20
-	LDA SRAM_TRACK_OFS, X
+	JSR (LOAD_TRACK_BG1_JSR_TABLE, X)
 
+	JSL !DECOMP_TRACK_BG_TILEMAP
+
+	PLP
+	
+	RTL
+;=========================================================
+
+;=========================================================
+; Hijack the loading of the track BG2 horizon to use the correct table for GP2 if necessary
+;=========================================================
+Hijack_Load_Track_BG2:
+	PHP
+	
+	JSR Get_League_Table_Offset
+
+	TXY
 	TAX
 
-	SEP #$20
+	REP #$20
+	JSR (LOAD_TRACK_BG2_JSR_TABLE, X)
 
-	JML $02c616
+	JSL !DECOMP_TRACK_BG_TILEMAP
+
+	PLP
+	
+	RTL
 ;=========================================================
 
 ;=========================================================
@@ -597,17 +670,6 @@ Hijack_Get_Track_SRAM_Ofs:
 ;=========================================================
 UPLOAD_XBPP_BANK_TABLE:
 	DW $000f, $000f, $000f, $001f
-;=========================================================
-
-;=========================================================
-; New Sram_track_ofs to add in additional maps/leagues
-;=========================================================
-SRAM_TRACK_OFS:
-	DB $05, $00, $26, $00, $47, $00, $68, $00, $89, $00
-	DB $ac, $00, $cd, $00, $ee, $00, $0f, $01, $30, $01
-	DB $53, $01, $74, $01, $95, $01, $b6, $01, $d7, $01
-GP2_SRAM_TRACK_OFS:
-	DB $05, $00, $26, $00, $47, $00, $68, $00, $89, $00 ; Reusing knight league values, should be - DB $F8, $01, $19, $02, $3A, $02, $5B, $02, $7C, $02, need to expand memory/change refs
 ;=========================================================
 
 ;=========================================================
@@ -650,6 +712,51 @@ BLANK_TRACK_NAME:
 	DB $44, $53, $01, $88, $1B, $00
 ;=========================================================
 
+
+;=========================================================
+; Hijacks the loading of horizon gradients allowing GP2 and custom tracks to specify their horizon gradients regardless of venue
+;=========================================================
+Hijack_Horizon_Gradient:
+
+	JSR Get_League_Table_Offset
+	
+	PHX
+	
+	TAX
+	
+	JSR (HORIZON_GRADIENT_JSR_TABLE, X)
+	
+	STA $9c
+	
+	PLX
+	
+	JML $00a122
+;=========================================================
+
+;=========================================================
+; Horizon gradient hijack tables
+;=========================================================
+HORIZON_GRADIENT_JSR_TABLE:
+	DW FZ_HORIZON_GRADIENT, FZ_HORIZON_GRADIENT, FZ_HORIZON_GRADIENT, GP2_HORIZON_GRADIENT
+
+HORIZON_GRADIENT_FUNC_TABLE:
+	FZ_HORIZON_GRADIENT:
+		TYX
+		LDA $00a47b, x
+		RTS
+	GP2_HORIZON_GRADIENT:
+		TYX
+		LDA GP2_TRACK_HORIZON_GRADIENTS, x
+		RTS
+;=========================================================
+
+;=========================================================
+; GP2 horizon gradient values by track venue
+;=========================================================
+GP2_TRACK_HORIZON_GRADIENTS:
+	DB $23, $a3, $23, $a3, $23, $23, $a3, $a3, $23, $23, $a3
+;=========================================================
+
 ;=========================================================
 ; League selction hijack tables
 ;=========================================================
@@ -689,6 +796,38 @@ SELECT_LEAGUE_SCREEN_ACE_LEAGUE_TILES:
 SELECT_LEAGUE_CLEAR_TILES:
 	DB $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08, $FF, $08
 ;=========================================================
+
+;=========================================================
+; Track horizon BG tilemap handling
+;=========================================================
+macro LoadTrackBGxFunclet(BGx_TILEMAP_ADDR_L)
+	TYX
+	LDA.l <BGx_TILEMAP_ADDR_L>,x
+	TAY
+	RTS
+endmacro
+
+org $30E900
+LOAD_TRACK_BG1_JSR_TABLE:
+	dw FZ_LOAD_TRACK_BG1, FZ_LOAD_TRACK_BG1, FZ_LOAD_TRACK_BG1, GP2_LOAD_TRACK_BG1
+
+org $30EA00
+LOAD_TRACK_BG1_FUNC_TABLE:
+	FZ_LOAD_TRACK_BG1:
+		%LoadTrackBGxFunclet(!FZ_BG1_TILEMAP_OFFSET)
+	GP2_LOAD_TRACK_BG1:
+		%LoadTrackBGxFunclet(!GP2_BG1_TILEMAP_OFFSET)
+
+org $30EB00
+LOAD_TRACK_BG2_JSR_TABLE:
+	dw FZ_LOAD_TRACK_BG2, FZ_LOAD_TRACK_BG2, FZ_LOAD_TRACK_BG2, GP2_LOAD_TRACK_BG2
+
+org $30EC00
+LOAD_TRACK_BG2_FUNC_TABLE:
+	FZ_LOAD_TRACK_BG2:
+		%LoadTrackBGxFunclet(!FZ_BG2_TILEMAP_OFFSET)
+	GP2_LOAD_TRACK_BG2:
+		%LoadTrackBGxFunclet(!GP2_BG2_TILEMAP_OFFSET)
 
 ;=========================================================
 ; Track modifications hijack table

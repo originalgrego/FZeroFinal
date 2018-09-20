@@ -27,6 +27,10 @@ Adjust_Track_Name:
 	NOP
 	NOP
 
+; Change the track at the title screen to Port Town II
+org $0380AE
+	LDA #$0C
+
 ; HOPEFULLY FIX ALL CASES OF WEIRDNESS ON TRACKS 8 TO 15
 org $02C33F
 	JSL Get_Track_Num_x4
@@ -47,7 +51,9 @@ org $02C1CC
 ;=========================================================
 ;=========================================================
 Get_Track_Num_x4:
-	LDA $0EEC
+	LDX #$00
+	LDA $53
+	%Divide($05)
 	ASL A
 	ASL A
 	RTL
