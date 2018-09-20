@@ -86,8 +86,20 @@ Hijack_Init_Player_Car:
 
 	%Method_Select(#$10, .check_for_master_ending)
 	
+	LDA $58
+	BEQ .not_practice
+	
+	JSR Load_Vehicle_Palette_Prep
+	LDY #$0680
+	MVN $00,$1F
+	SEP #$30
+
+	BRA .continue_gp2
+	
+.not_practice
 	JSR Load_GP2_Vehicle_Palette
 	
+.continue_gp2
 	%GP2_Method_Pre($0010)
 	JSL Init_Player_Car_GP2
 	%GP2_Method_Post()
@@ -99,7 +111,7 @@ Hijack_Init_Player_Car:
 	BEQ .do_fz_init_player_car ; If not Playing master ending, skip GP2 palette
 	LDA $0F51
 	BIT #$10
-	BEQ .do_fz_init_player_car ; If master ending car is an FZ car, skip GP2 palette
+	BEQ .exit ; If master ending car is an FZ car, skip GP2 palette
 	
 	; A copy of "Load_GP2_Vehicle_Palette", but a little different
 	REP #$30
@@ -109,7 +121,19 @@ Hijack_Init_Player_Car:
 	SEP #$30
 	; A copy of "Load_GP2_Vehicle_Palette", but a little different
 	
+	bra .exit
+	
 .do_fz_init_player_car
+
+	LDA $58
+	BEQ .exit
+	
+	JSR Load_Vehicle_Palette_Prep
+	LDY #$0680
+	MVN $00,$0F
+	SEP #$30
+	
+.exit
 	JML Init_Player_Car_FZ
 ;=========================================================
 
